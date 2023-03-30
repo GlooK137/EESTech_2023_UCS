@@ -1,20 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import ScreenOne from './screens/ScreenOne';
+import ScreenTwo from './screens/ScreenTwo';
+import ScreenThree from './screens/ScreenThree';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function App() {
+const Tab = createBottomTabNavigator();
+
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+            if (route.name === 'ScreenOne') {
+              iconName = 'home-outline';
+            } else if (route.name === 'ScreenTwo') {
+              iconName = 'chatbubbles-outline';
+            } else if (route.name === 'ScreenThree') {
+              iconName = 'person-outline';
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+        tabBarOptions={{
+          activeTintColor: 'blue',
+          inactiveTintColor: 'gray',
+        }}
+      >
+        <Tab.Screen name="ScreenOne" component={ScreenOne} />
+        <Tab.Screen name="ScreenTwo" component={ScreenTwo} />
+        <Tab.Screen name="ScreenThree" component={ScreenThree} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
