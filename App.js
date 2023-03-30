@@ -13,10 +13,11 @@ const App = () => {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
+          headerShown: false,
           tabBarIcon: ({ color, size }) => {
             let iconName;
 
-            if (route.name === 'ScreenOne') {
+            if (route.name === 'Home') {
               iconName = 'home-outline';
             } else if (route.name === 'ScreenTwo') {
               iconName = 'chatbubbles-outline';
@@ -32,7 +33,7 @@ const App = () => {
           inactiveTintColor: 'gray',
         }}
       >
-        <Tab.Screen name="ScreenOne" component={ScreenOne} />
+        <Tab.Screen name="Home" component={ScreenOne} />
         <Tab.Screen name="ScreenTwo" component={ScreenTwo} />
         <Tab.Screen name="ScreenThree" component={ScreenThree} />
       </Tab.Navigator>
