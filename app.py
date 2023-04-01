@@ -19,9 +19,9 @@ def index():
 def register():
     user_name = request.form.get('name')
     print(user_name)
-    db_connect.register_user(user_name)
+
     # return jsonify({'user_id': user_id})
-    return jsonify({"out":True})
+    return jsonify({"user_id":db_connect.register_user(user_name)})
 
 
 

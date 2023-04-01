@@ -127,8 +127,10 @@ class DBConnect():
 
 
     def register_user(self, name):
-
         self.cursor.execute("INSERT INTO users (name) VALUES (%s);", (name,))
+
+        self.cursor.execute("SELECT id FROM users")
+        return self.cursor.fetchall()[-1][0]
 
     def cash(self, user_id):
         self.cursor.execute("SELECT SUM(point)*7 FROM users_quiz WHERE id_user=%s;", (user_id,))
