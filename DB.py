@@ -23,4 +23,4 @@ db.commit()
 cursor.close()
 
 # Закрытие соединения
-cursor.close()
+db.close()
