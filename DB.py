@@ -1,4 +1,4 @@
- import os
+import os
 import psycopg2
 
 # Чтение переменных окружения
@@ -8,17 +8,18 @@ db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
 
 # Подключение к PostgreSQL
-conn = psycopg2.connect(
+db = psycopg2.connect(
     host=db_host,
     database=db_name,
     user=db_user,
-    password=db_password
+    password=db_password,
+    port=5432
 )
 
 # Создание таблицы
-cur = conn.cursor()
-cur.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(255));")
-cur.close()
+cursor = db.cursor()
+cursor.execute("CREATE TABLE users3 (id SERIAL PRIMARY KEY, name VARCHAR(255));")
+cursor.close()
 
 # Закрытие соединения
-conn.close()
+cursor.close()
