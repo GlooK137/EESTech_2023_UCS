@@ -132,6 +132,13 @@ class DBConnect():
         self.cursor.execute("SELECT id FROM users")
         return self.cursor.fetchall()[-1][0]
 
+
+
+    def register_miro_user(self, name, id_event):
+        self.cursor.execute("INSERT INTO reg_for_event (id_user, id_event) VALUES (%s, %s);", (name, id_event))
+
+
+
     def cash(self, user_id):
         self.cursor.execute("SELECT SUM(point)*7 FROM users_quiz WHERE id_user=%s;", (user_id,))
         quests = self.cursor.fetchone()[0]
@@ -161,6 +168,21 @@ class DBConnect():
         out = {}
         for key, element in data:
             out[key] = element
+
+        return out
+
+    def miro_get(self):
+
+        self.cursor.execute("SELECT * FROM events;")
+        data = self.cursor.fetchall()
+        out = {}
+        for key, name, video, date in data:
+            out[key] = {
+                "id_event": key,
+                "name":name,
+                "video":video,
+                "date": date
+            }
 
         return out
 

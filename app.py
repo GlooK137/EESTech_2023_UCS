@@ -24,6 +24,23 @@ def register():
     return jsonify({"user_id":db_connect.register_user(user_name)})
 
 
+@app.route('/registermiro', methods=['POST'])
+def register_miro():
+    user_name = request.form.get('user_id')
+    id_event = request.form.get('id_event')
+    print(user_name)
+    db_connect.register_miro_user(user_name, id_event)
+    # return jsonify({'user_id': user_id})
+    return jsonify({"status": "OK"})
+
+
+
+
+@app.route('/miro', methods=['GET'])
+def miro_get():
+    data = db_connect.miro_get()
+    # return jsonify({'user_id': user_id})
+    return jsonify(data)
 
 @app.route('/genre', methods=['GET'])
 def genre_get():
