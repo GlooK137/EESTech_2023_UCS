@@ -19,6 +19,7 @@ db = psycopg2.connect(
 # Создание таблицы
 cursor = db.cursor()
 cursor.execute("CREATE TABLE users3 (id SERIAL PRIMARY KEY, name VARCHAR(255));")
+db.commit()
 cursor.close()
 
 # Закрытие соединения
