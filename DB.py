@@ -150,8 +150,7 @@ class DBConnect():
                    WHERE genre_id = %s 
                    AND id NOT IN (SELECT id_question FROM users_quiz WHERE id_user = %s) 
                    ORDER BY random() LIMIT 1;"""
-        genre_id = 0
-        is_user = 1
+
         self.cursor.execute(query, (genre_id, is_user))
         random_question = self.cursor.fetchone()
         print(random_question)
@@ -169,7 +168,37 @@ class DBConnect():
                 "info": False,
                 'status': "the questions are over"
             }
+    
+    
+    def put_answer(self, user_id, qustion_id, status):
 
+        self.cursor.execute("INSERT INTO users_quiz (id_user, id_question, point) VALUES (%s, %s, %s);", (user_id, qustion_id, status))
+
+        # query = """SELECT id, question, answer, correct_answer FROM question_db
+        #            WHERE genre_id = %s
+        #            AND id NOT IN (SELECT id_question FROM users_quiz WHERE id_user = %s)
+        #            ORDER BY random() LIMIT 1;"""
+        # genre_id = 0
+        # is_user = 1
+        # self.cursor.execute(query, (genre_id, is_user))
+        # random_question = self.cursor.fetchone()
+        # print(random_question)
+        #
+        # if random_question:
+        #     return {
+        #         "info": True,
+        #         'question_id': random_question[0],
+        #         'question': random_question[1],
+        #         'answer': json.loads(random_question[2]),
+        #         'correct_answer':random_question[3]
+        #     }
+        # else:
+        #     return {
+        #         "info": False,
+        #         'status': "the questions are over"
+        #     }
+
+    
     def register_miro(self, name, video, data):
         self.cursor.execute("INSERT INTO events (name, video, data) VALUES (%s, %s, %s);", (name, video, data))
         # user_id = self.cursor.fetchone()[0]
@@ -192,34 +221,98 @@ class DBConnect():
     # db.close()
 
 
-if __name__ == '__main__':
+
+def start_db():
+    DBConnect().drop()
     db_conn = DBConnect()
 
-    status = 1
-    if status:
-        db_conn.register_new_genre('Безопасность1')
-        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2, 1, 'foto/ava.jpg')
 
-        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
-                                 1, 'foto/ava.jpg')
+    db_conn.register_user('Nikita')
 
-        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
-                                 1, 'foto/ava.jpg')
+    db_conn.register_new_genre('Безопасность')
+    db_conn.register_new_genre('Политика компании')
+    db_conn.register_new_genre('Безопасность')
+    db_conn.register_new_genre('Интересы компании')
 
-        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
-                                 1, 'foto/ava.jpg')
+    db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
+                             2, 1, 'foto/ava.jpg')
 
-        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
-                                 1, 'foto/ava.jpg')
+    db_conn.register_qustion('Вопрос 2', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
 
-        db_conn.register_miro('Мир', 'video/mir.mp4', time.time() + 24*60*60*6)
+    db_conn.register_qustion('Вопрос 3', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 4', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 5', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Что нельзя засовывать в розетку?', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
+                             2, 1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 2', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 3', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 4', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 5', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Что нельзя засовывать в розетку?', 2, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
+                             2, 1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 2', 2, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 3', 2, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/avajpg')
+
+    db_conn.register_qustion('Вопрос 4', 2, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 5', 2, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Что нельзя засовывать в розетку?', 3, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
+                             2, 1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 2', 3, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 3', 3, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 4', 3, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_qustion('Вопрос 5', 3, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
+                             1, 'foto/ava.jpg')
+
+    db_conn.register_miro('Мир', 'video/mir.mp4', time.time() + 24 * 60 * 60 * 6)
 
 
+if __name__ == '__main__':
+    pass
 
 
-
-    else:
-        db_conn.drop()
-
-
-    db_conn.close()
+    # status = 0
+    # # status = 1
+    #
+    # if status:
+    #
+    #     pass
+    #
+    #
+    #
+    #
+    # else:
+    #     # db_conn.drop()
+    #
+    #
+    # # db_conn.close()

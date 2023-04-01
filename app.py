@@ -3,6 +3,8 @@ import json
 import DB
 import os
 
+DB.start_db()
+
 db_connect = DB.DBConnect()
 
 app = Flask(__name__, static_folder='video')
@@ -28,9 +30,30 @@ def question():
 
     rez = db_connect.get_question(user_id, genre_id)
     # print(user_name)
-    # db_connect.register_user(user_name)
+    # db_connect.register_user(user_name)z
     # return jsonify({'user_id': user_id})
     return jsonify(rez)
+
+@app.route('/answer', methods=['POST'])
+def answer():
+    user_id = request.form.get('user_id')
+    qustion_id = request.form.get('qustion_id')
+    answer = request.form.get('answer')
+    correct_answer = request.form.get('correct_answer')
+
+    if answer == correct_answer:
+        status = 1
+    else:
+        status = 0
+
+    rez = db_connect.put_answer(user_id, qustion_id, status)
+    # print(user_name)
+    # db_connect.register_user(user_name)z
+    # return jsonify({'user_id': user_id})
+    return jsonify({'status': status})
+
+
+
 
 
 @app.route('/videos/<path:filename>')
