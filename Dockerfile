@@ -13,5 +13,5 @@ ENV FLASK_APP=app.py
 EXPOSE 5000
 
 # Запускаем команду для запуска Flask приложения внутри контейнера
-# CMD ["flask", "run", "--host=0.0.0.0"]
-CMD python db.py
+CMD ["flask", "run", "--host=0.0.0.0"]
+# CMD python db.py
