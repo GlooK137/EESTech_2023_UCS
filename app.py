@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import json
 import DB
+import os
 
 db_connect = DB.DBConnect()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='video')
 
 @app.route('/')
 def index():
@@ -27,6 +28,16 @@ def register():
     db_connect.register_user(user_name)
     # return jsonify({'user_id': user_id})
     return json.dumps({"out":True})
+
+
+@app.route('/videos/<path:filename>')
+def download_file(filename):
+    # Получаем путь к файлу из переменной окружения BASE_DIR
+    directory = os.environ.get('BASE_DIR', '/path/to/your/app')
+    # Объединяем путь к директории с видео и запрашиваемое имя файла
+    path = os.path.join(directory, 'video', filename)
+    # Используем функцию send_from_directory для отправки файла пользователю
+    return send_from_directory(directory=path, filename=filename)
 
 
 
