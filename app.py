@@ -43,6 +43,20 @@ def question():
     # return jsonify({'user_id': user_id})
     return jsonify(rez)
 
+
+
+
+@app.route('/cash', methods=['POST'])
+def cash():
+    user_id = request.form.get('user_id')
+
+    rez = db_connect.cash(user_id)
+    # print(user_name)
+    # db_connect.register_user(user_name)z
+    # return jsonify({'user_id': user_id})
+    return jsonify(rez)
+
+
 @app.route('/answer', methods=['POST'])
 def answer():
     user_id = request.form.get('user_id')

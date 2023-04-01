@@ -118,10 +118,10 @@ class DBConnect():
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS quests_table (
               id_user INTEGER,
-              id_question INTEGER,
+              id_genre INTEGER,
               points INTEGER,
               FOREIGN KEY (id_user) REFERENCES users(id),
-              FOREIGN KEY (id_question) REFERENCES question_db(id)
+              FOREIGN KEY (id_genre) REFERENCES genre_table(genre_id)
             );
         """)
 
@@ -130,6 +130,27 @@ class DBConnect():
 
         self.cursor.execute("INSERT INTO users (name) VALUES (%s);", (name,))
 
+    def cash(self, user_id):
+        self.cursor.execute("SELECT SUM(point)*7 FROM users_quiz WHERE id_user=%s;", (user_id,))
+        quests = self.cursor.fetchone()[0]
+        print(quests)
+        if quests:
+            quests = quests
+        else:
+            quests = 0
+
+        self.cursor.execute("SELECT SUM(points) FROM quests_table WHERE id_user=%s;", (user_id,))
+        points = self.cursor.fetchone()[0]
+        if quests:
+            points = points
+        else:
+            points = 0
+
+        return {
+            'cash_quests':quests,
+            'cash_points': points,
+            'cash_all': quests + points,
+        }
 
     def genre_get(self):
 
@@ -176,9 +197,14 @@ class DBConnect():
                 'correct_answer':random_question[3]
             }
         else:
+            print(is_user, genre_id, 47)
+            self.cursor.execute(
+                "INSERT INTO quests_table (id_user, id_genre, points) VALUES (%s, %s, %s);",
+                (is_user, genre_id, 47))
+
             return {
                 "info": False,
-                'status': "the questions are over"
+                'status': "All questions are gone. Earn extra points"
             }
     
     
@@ -246,20 +272,7 @@ def start_db():
     db_conn.register_new_genre('Безопасность')
     db_conn.register_new_genre('Интересы компании')
 
-    db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
-                             2, 1, 'foto/ava.jpg')
 
-    db_conn.register_qustion('Вопрос 2', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
-                             1, 'foto/ava.jpg')
-
-    db_conn.register_qustion('Вопрос 3', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
-                             1, 'foto/ava.jpg')
-
-    db_conn.register_qustion('Вопрос 4', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
-                             1, 'foto/ava.jpg')
-
-    db_conn.register_qustion('Вопрос 5', 0, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
-                             1, 'foto/ava.jpg')
 
     db_conn.register_qustion('Что нельзя засовывать в розетку?', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
                              2, 1, 'foto/ava.jpg')
