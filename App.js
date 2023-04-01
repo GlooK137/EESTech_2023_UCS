@@ -1,8 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import ScreenOne from './screens/ScreenOne';
-import ScreenTwo from './screens/ScreenTwo';
+import MainScreen from './screens/mainScreen';
+import EventsListScreen from './screens/EventsListScreen';
 import ScreenThree from './screens/ScreenThree';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -17,25 +17,31 @@ const App = () => {
           tabBarIcon: ({ color, size }) => {
             let iconName;
 
-            if (route.name === 'Home') {
-              iconName = 'home-outline';
-            } else if (route.name === 'ScreenTwo') {
-              iconName = 'chatbubbles-outline';
-            } else if (route.name === 'ScreenThree') {
-              iconName = 'person-outline';
+            if (route.name === 'mainScreen') {
+              iconName = 'ios-home';
+            } else if (route.name === 'eventsList') {
+              iconName = 'ios-calendar';
+            } else if (route.name === 'leaderBoard') {
+              iconName = 'ios-people';
+            } else if (route.name === 'personalCabinet') {
+              iconName = 'ios-person';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}
         tabBarOptions={{
-          activeTintColor: 'blue',
+          activeTintColor: '#28619B',
           inactiveTintColor: 'gray',
+          showLabel: false,
+          activeBackgroundColor: '#1D1D27',
+          inactiveBackgroundColor: '#1D1D27',
         }}
       >
-        <Tab.Screen name="Home" component={ScreenOne} />
-        <Tab.Screen name="ScreenTwo" component={ScreenTwo} />
-        <Tab.Screen name="ScreenThree" component={ScreenThree} />
+        <Tab.Screen name="mainScreen" component={MainScreen} />
+        <Tab.Screen name="eventsList" component={EventsListScreen} />
+        <Tab.Screen name="leaderBoard" component={ScreenThree} />
+        <Tab.Screen name="personalCabinet" component={ScreenThree} />
       </Tab.Navigator>
     </NavigationContainer>
   );

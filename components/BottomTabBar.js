@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     height: TAB_BAR_HEIGHT,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0,0,0,0)',
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#ddd',
     paddingHorizontal: 10,
@@ -74,7 +74,7 @@ const BottomTabBar = ({ state, descriptors, navigation }) => {
           </TouchableOpacity>
         );
       })}
-      <Animated.View style={[tabStyles, { height: 2, backgroundColor: '#00bcd4', position: 'absolute', bottom: 0 }]} />
+      <Animated.View style={[tabStyles, { height: 2, position: 'absolute', bottom: 0 }]} />
     </View>
   );
 };
