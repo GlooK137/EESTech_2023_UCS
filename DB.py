@@ -88,6 +88,15 @@ class DBConnect():
         """)
 
         self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS logs (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            log_txt TEXT,
+            log_time INTEGER
+            );      
+        """)
+
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users_quiz (
               id_user INTEGER,
               id_question INTEGER,
@@ -130,13 +139,24 @@ class DBConnect():
         self.cursor.execute("INSERT INTO users (name) VALUES (%s);", (name,))
 
         self.cursor.execute("SELECT id FROM users")
-        return self.cursor.fetchall()[-1][0]
+        user_id = self.cursor.fetchall()[-1][0]
+
+        self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
+            user_id,
+            'Создание аккаунта',
+            time.time()
+            ))
+        return user_id
 
 
 
-    def register_miro_user(self, name, id_event):
-        self.cursor.execute("INSERT INTO reg_for_event (id_user, id_event) VALUES (%s, %s);", (name, id_event))
-
+    def register_miro_user(self, id_user, id_event):
+        self.cursor.execute("INSERT INTO reg_for_event (id_user, id_event) VALUES (%s, %s);", (id_user, id_event))
+        self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
+            id_user,
+            f'Регистрация на мероприятие {id_event}',
+            time.time()
+            ))
 
 
     def cash(self, user_id):
@@ -187,6 +207,20 @@ class DBConnect():
         return out
 
 
+    def get_logs(self, user_name):
+
+        self.cursor.execute("SELECT log_txt, log_time FROM logs WHERE user_id=%s;", (user_name))
+        data = self.cursor.fetchall()
+        out = []
+        for log_txt, log_time in data:
+            out.append({
+                "log_txt": log_txt,
+                "log_time":log_time
+            })
+
+        return out
+
+
     def register_new_genre(self, new_genre):
         self.cursor.execute("""INSERT INTO genre_table (genre) 
                 SELECT %s 
@@ -226,6 +260,12 @@ class DBConnect():
                 "INSERT INTO quests_table (id_user, id_genre, points) VALUES (%s, %s, %s);",
                 (is_user, genre_id, 47))
 
+            self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
+                is_user,
+                'Награда за решение группы заданий',
+                time.time()
+            ))
+
             return {
                 "info": False,
                 'status': "All questions are gone. Earn extra points"
@@ -235,6 +275,11 @@ class DBConnect():
     def put_answer(self, user_id, qustion_id, status):
 
         self.cursor.execute("INSERT INTO users_quiz (id_user, id_question, point) VALUES (%s, %s, %s);", (user_id, qustion_id, status))
+        self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
+            user_id,
+            f'Ответ на вопрос {qustion_id}. Результат {bool(status)}',
+            time.time()
+            ))
 
         # query = """SELECT id, question, answer, correct_answer FROM question_db
         #            WHERE genre_id = %s
@@ -268,7 +313,7 @@ class DBConnect():
 
 
     def drop(self):
-        self.cursor.execute("DROP TABLE IF EXISTS reg_for_event, quests_table, users_quiz, question_db, genre_table, events, users;")
+        self.cursor.execute("DROP TABLE IF EXISTS reg_for_event CASCADE; DROP TABLE IF EXISTS logs CASCADE; DROP TABLE IF EXISTS quests_table CASCADE; DROP TABLE IF EXISTS users_quiz CASCADE; DROP TABLE IF EXISTS question_db CASCADE; DROP TABLE IF EXISTS genre_table CASCADE; DROP TABLE IF EXISTS events CASCADE; DROP TABLE IF EXISTS users CASCADE;")
 
     def close(self):
         self.db.commit()

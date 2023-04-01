@@ -21,7 +21,7 @@ def register():
     print(user_name)
 
     # return jsonify({'user_id': user_id})
-    return jsonify({"user_id":db_connect.register_user(user_name)})
+    return jsonify({"user_id": db_connect.register_user(user_name)})
 
 
 @app.route('/registermiro', methods=['POST'])
@@ -34,6 +34,14 @@ def register_miro():
     return jsonify({"status": "OK"})
 
 
+@app.route('/get-logs', methods=['POST'])
+def get_logs():
+    user_name = request.form.get('user_id')
+
+
+
+    # return jsonify({'user_id': user_id})
+    return jsonify({"logs": db_connect.get_logs(user_name)})
 
 
 @app.route('/miro', methods=['GET'])
@@ -86,7 +94,7 @@ def answer():
     else:
         status = 0
 
-    rez = db_connect.put_answer(user_id, qustion_id, status)
+    db_connect.put_answer(user_id, qustion_id, status)
     # print(user_name)
     # db_connect.register_user(user_name)z
     # return jsonify({'user_id': user_id})
