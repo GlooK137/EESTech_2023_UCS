@@ -11,14 +11,6 @@ app = Flask(__name__, static_folder='video')
 def index():
     return """API"""
 
-# @app.route('/calculate', methods=['POST'])
-# def calculate():
-#     # print(request.form.get("num1"))
-#     num1 = float(request.form.get('num1'))
-#     num2 = float(request.form.get('num2'))
-#     print(num1)
-#
-#     return json.dumps({"out":"10"})
 
 
 @app.route('/register', methods=['POST'])
@@ -27,7 +19,18 @@ def register():
     print(user_name)
     db_connect.register_user(user_name)
     # return jsonify({'user_id': user_id})
-    return json.dumps({"out":True})
+    return jsonify({"out":True})
+
+@app.route('/question', methods=['POST'])
+def question():
+    user_id = request.form.get('user_id')
+    genre_id = request.form.get('genre_id')
+
+    rez = db_connect.get_question(user_id, genre_id)
+    # print(user_name)
+    # db_connect.register_user(user_name)
+    # return jsonify({'user_id': user_id})
+    return jsonify(rez)
 
 
 @app.route('/videos/<path:filename>')

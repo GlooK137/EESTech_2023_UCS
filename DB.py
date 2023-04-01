@@ -82,7 +82,8 @@ class DBConnect():
               genre_id INTEGER,
               answer TEXT,
               correct_answer TEXT,
-              points INTEGER
+              points INTEGER,
+              foto TEXT
             );
         """)
 
@@ -138,15 +139,45 @@ class DBConnect():
                 """, (new_genre,new_genre))
 
 
-    def register_qustion(self, question, genre_id, answer, correct_answer, points):
-        self.cursor.execute("INSERT INTO question_db (question, genre_id, answer, correct_answer, points) VALUES (%s, %s, %s, %s, %s);", (question, genre_id, answer, correct_answer, points))
+    def register_qustion(self, question, genre_id, answer, correct_answer, points, foto):
+        self.cursor.execute("INSERT INTO question_db (question, genre_id, answer, correct_answer, points, foto) VALUES (%s, %s, %s, %s, %s, %s);", (question, genre_id, answer, correct_answer, points, foto))
         # user_id = self.cursor.fetchone()[0]
         # return user_id
+
+
+    def get_question(self, is_user, genre_id):
+        query = """SELECT id, question, answer, correct_answer FROM question_db 
+                   WHERE genre_id = %s 
+                   AND id NOT IN (SELECT id_question FROM users_quiz WHERE id_user = %s) 
+                   ORDER BY random() LIMIT 1;"""
+        genre_id = 0
+        is_user = 1
+        self.cursor.execute(query, (genre_id, is_user))
+        random_question = self.cursor.fetchone()
+        print(random_question)
+
+        if random_question:
+            return {
+                "info": True,
+                'question_id': random_question[0],
+                'question': random_question[1],
+                'answer': json.loads(random_question[2]),
+                'correct_answer':random_question[3]
+            }
+        else:
+            return {
+                "info": False,
+                'status': "the questions are over"
+            }
 
     def register_miro(self, name, video, data):
         self.cursor.execute("INSERT INTO events (name, video, data) VALUES (%s, %s, %s);", (name, video, data))
         # user_id = self.cursor.fetchone()[0]
         # return user_id
+
+
+    def drop(self):
+        self.cursor.execute("DROP TABLE IF EXISTS reg_for_event, quests_table, users_quiz, question_db, genre_table, events, users;")
 
     def close(self):
         self.db.commit()
@@ -163,10 +194,32 @@ class DBConnect():
 
 if __name__ == '__main__':
     db_conn = DBConnect()
-    db_conn.register_new_genre('Безопасность1')
-    db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2, 1)
 
-    db_conn.register_miro('Мир', 'video/mir.mp4', time.time() + 24*60*60*6)
+    status = 1
+    if status:
+        db_conn.register_new_genre('Безопасность1')
+        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2, 1, 'foto/ava.jpg')
+
+        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
+                                 1, 'foto/ava.jpg')
+
+        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
+                                 1, 'foto/ava.jpg')
+
+        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
+                                 1, 'foto/ava.jpg')
+
+        db_conn.register_qustion('Что нельзя засовывать в розетку?', 0, json.dumps(['Чайник', "Принтер", "Пальцы"]), 2,
+                                 1, 'foto/ava.jpg')
+
+        db_conn.register_miro('Мир', 'video/mir.mp4', time.time() + 24*60*60*6)
+
+
+
+
+
+    else:
+        db_conn.drop()
 
 
     db_conn.close()
