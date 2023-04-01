@@ -31,7 +31,7 @@ def register():
 
 
 @app.route('/videos/<path:filename>')
-def download_file(filename):
+def download_file_video(filename):
     # Получаем путь к файлу из переменной окружения BASE_DIR
     directory = os.environ.get('BASE_DIR', '/path/to/your/app')
     # Объединяем путь к директории с видео и запрашиваемое имя файла
@@ -39,6 +39,16 @@ def download_file(filename):
     # Используем функцию send_from_directory для отправки файла пользователю
     return send_from_directory(directory=path, filename=filename)
 
+
+
+@app.route('/foto/<path:filename>')
+def download_file_foto(filename):
+    # Получаем путь к файлу из переменной окружения BASE_DIR
+    directory = os.environ.get('BASE_DIR', '/path/to/your/app')
+    # Объединяем путь к директории с видео и запрашиваемое имя файла
+    path = os.path.join(directory, 'video', filename)
+    # Используем функцию send_from_directory для отправки файла пользователю
+    return send_from_directory(directory=path, filename=filename)
 
 
 if __name__ == '__main__':
