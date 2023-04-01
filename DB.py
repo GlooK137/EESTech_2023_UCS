@@ -3,9 +3,7 @@ import os
 import time
 
 import psycopg2
-from dotenv import load_dotenv
-
-load_dotenv()
+import config
 # # Чтение переменных окружения
 # db_host = os.getenv("DB_HOST")
 # db_name = os.getenv("DB_NAME")
