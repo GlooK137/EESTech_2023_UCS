@@ -23,6 +23,15 @@ def register():
     # return jsonify({'user_id': user_id})
     return jsonify({"out":True})
 
+
+
+@app.route('/genre', methods=['GET'])
+def genre_get():
+    data = db_connect.genre_get()
+    # return jsonify({'user_id': user_id})
+    return jsonify(data)
+
+
 @app.route('/question', methods=['POST'])
 def question():
     user_id = request.form.get('user_id')

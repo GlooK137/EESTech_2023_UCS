@@ -130,6 +130,18 @@ class DBConnect():
 
         self.cursor.execute("INSERT INTO users (name) VALUES (%s);", (name,))
 
+
+    def genre_get(self):
+
+        self.cursor.execute("SELECT * FROM genre_table;")
+        data = self.cursor.fetchall()
+        out = {}
+        for key, element in data:
+            out[key] = element
+
+        return out
+
+
     def register_new_genre(self, new_genre):
         self.cursor.execute("""INSERT INTO genre_table (genre) 
                 SELECT %s 
