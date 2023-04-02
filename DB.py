@@ -10,7 +10,7 @@ import config
 
 class DBConnect():
 
-    def __init__(self):
+    def __init__(self, caunt=10):
         # Чтение переменных окружения
         db_host = os.getenv("DB_HOST")
         db_name = os.getenv("DB_NAME")
@@ -18,19 +18,24 @@ class DBConnect():
         db_password = os.getenv("DB_PASSWORD")
 
         # Подключение к PostgreSQL
-        self.db = psycopg2.connect(
-            host=db_host,
-            database=db_name,
-            user=db_user,
-            password=db_password,
-            port=5432
-        )
+        try:
+            self.db = psycopg2.connect(
+                host=db_host,
+                database=db_name,
+                user=db_user,
+                password=db_password,
+                port=5432
+            )
 
-        self.db.autocommit = True
 
-        self.cursor = self.db.cursor()
+            self.db.autocommit = True
 
-        self.create_db()
+            self.cursor = self.db.cursor()
+
+            self.create_db()
+        except:
+            time.sleep(5)
+            self.__init__(caunt=caunt-1)
 
     def create_db(self):
 

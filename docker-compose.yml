@@ -1,0 +1,29 @@
+version: '3'
+networks:
+  my_network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myusername
+      POSTGRES_PASSWORD: mypassword
+    networks:
+      - my_network
+  my_app:
+    build: .
+    environment:
+      DB_HOST: postgres
+      DB_NAME: mydatabase
+      DB_USER: myusername
+      DB_PASSWORD: mypassword
+    ports:
+      - "80:5000"
+    depends_on:
+      - postgres
+    networks:
+      - my_network
+    restart: always
+
