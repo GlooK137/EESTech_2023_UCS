@@ -4,29 +4,6 @@ import time
 
 import psycopg2
 import config
-# # Чтение переменных окружения
-# db_host = os.getenv("DB_HOST")
-# db_name = os.getenv("DB_NAME")
-# db_user = os.getenv("DB_USER")
-# db_password = os.getenv("DB_PASSWORD")
-#
-# # Подключение к PostgreSQL
-# db = psycopg2.connect(
-#     host=db_host,
-#     database=db_name,
-#     user=db_user,
-#     password=db_password,
-#     port=5432
-# )
-#
-# # Создание таблицы
-# cursor = db.cursor()
-# cursor.execute("CREATE TABLE users3 (id SERIAL PRIMARY KEY, name VARCHAR(255));")
-# db.commit()
-# cursor.close()
-#
-# # Закрытие соединения
-# db.close()
 
 
 
@@ -135,31 +112,36 @@ class DBConnect():
         """)
 
 
+    # Регистрация юзера
     def register_user(self, name):
         self.cursor.execute("INSERT INTO users (name) VALUES (%s);", (name,))
 
         self.cursor.execute("SELECT id FROM users")
         user_id = self.cursor.fetchall()[-1][0]
-
+        # логи юзера
         self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
             user_id,
             'Создание аккаунта',
             time.time()
-            ))
+        ))
         return user_id
 
 
 
+    # Регистрация юзера на мероприятие
     def register_miro_user(self, id_user, id_event):
         self.cursor.execute("INSERT INTO reg_for_event (id_user, id_event) VALUES (%s, %s);", (id_user, id_event))
         self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
             id_user,
             f'Регистрация на мероприятие {id_event}',
             time.time()
-            ))
+        ))
 
 
+
+    # Запрос баллов юзера
     def cash(self, user_id):
+        # Запрос баллов за викторину
         self.cursor.execute("SELECT SUM(point)*7 FROM users_quiz WHERE id_user=%s;", (user_id,))
         quests = self.cursor.fetchone()[0]
         print(quests)
@@ -168,6 +150,7 @@ class DBConnect():
         else:
             quests = 0
 
+        # Баллы за полностью пройденную тему
         self.cursor.execute("SELECT SUM(points) FROM quests_table WHERE id_user=%s;", (user_id,))
         points = self.cursor.fetchone()[0]
         if quests:
@@ -181,6 +164,8 @@ class DBConnect():
             'cash_all': quests + points,
         }
 
+
+    # Запрос тем для викторины
     def genre_get(self):
 
         self.cursor.execute("SELECT * FROM genre_table;")
@@ -191,6 +176,8 @@ class DBConnect():
 
         return out
 
+
+    # Запррос мироприятий
     def miro_get(self):
 
         self.cursor.execute("SELECT * FROM events;")
@@ -207,6 +194,8 @@ class DBConnect():
         return out
 
 
+
+    # Запрос логов юзера
     def get_logs(self, user_name):
 
         self.cursor.execute("SELECT log_txt, log_time FROM logs WHERE user_id=%s;", (user_name))
@@ -221,6 +210,8 @@ class DBConnect():
         return out
 
 
+
+    # Регистрация юзера на мероприятие
     def register_new_genre(self, new_genre):
         self.cursor.execute("""INSERT INTO genre_table (genre) 
                 SELECT %s 
@@ -230,12 +221,25 @@ class DBConnect():
                 """, (new_genre,new_genre))
 
 
+
+    # Создание нового вопроса для викторины
     def register_qustion(self, question, genre_id, answer, correct_answer, points, foto):
+        """
+        :param question: Вопрос
+        :param genre_id: id темы
+        :param answer: ответы
+        :param correct_answer: индекс верного ответа
+        :param points: баллы
+        :param foto: ссылка на фото
+        :return: None
+        """
         self.cursor.execute("INSERT INTO question_db (question, genre_id, answer, correct_answer, points, foto) VALUES (%s, %s, %s, %s, %s, %s);", (question, genre_id, answer, correct_answer, points, foto))
         # user_id = self.cursor.fetchone()[0]
         # return user_id
 
 
+
+    # Запрос нового вопроса для викторины. Выдает рандомный, а также тот что юзер еще не решал
     def get_question(self, is_user, genre_id):
         query = """SELECT id, question, answer, correct_answer FROM question_db 
                    WHERE genre_id = %s 
@@ -270,16 +274,20 @@ class DBConnect():
                 "info": False,
                 'status': "All questions are gone. Earn extra points"
             }
-    
-    
+
+
+
+
+    # Запись ответа юзера
     def put_answer(self, user_id, qustion_id, status):
 
         self.cursor.execute("INSERT INTO users_quiz (id_user, id_question, point) VALUES (%s, %s, %s);", (user_id, qustion_id, status))
+        # Логи юзера
         self.cursor.execute("INSERT INTO logs (user_id, log_txt, log_time) VALUES (%s, %s, %s);", (
             user_id,
             f'Ответ на вопрос {qustion_id}. Результат {bool(status)}',
             time.time()
-            ))
+        ))
 
         # query = """SELECT id, question, answer, correct_answer FROM question_db
         #            WHERE genre_id = %s
@@ -305,16 +313,22 @@ class DBConnect():
         #         'status': "the questions are over"
         #     }
 
-    
+
+
+    # Создание нового мероприятия
     def register_miro(self, name, video, data):
         self.cursor.execute("INSERT INTO events (name, video, data) VALUES (%s, %s, %s);", (name, video, data))
         # user_id = self.cursor.fetchone()[0]
         # return user_id
 
 
+    # Удаление всех таблиц
     def drop(self):
         self.cursor.execute("DROP TABLE IF EXISTS reg_for_event CASCADE; DROP TABLE IF EXISTS logs CASCADE; DROP TABLE IF EXISTS quests_table CASCADE; DROP TABLE IF EXISTS users_quiz CASCADE; DROP TABLE IF EXISTS question_db CASCADE; DROP TABLE IF EXISTS genre_table CASCADE; DROP TABLE IF EXISTS events CASCADE; DROP TABLE IF EXISTS users CASCADE;")
 
+
+
+    # Закрытие соединения с сервером
     def close(self):
         self.db.commit()
         self.cursor.close()
@@ -328,14 +342,17 @@ class DBConnect():
     # db.close()
 
 
-
+# Создание тестовых данных в базе
 def start_db():
-    DBConnect().drop()
-    db_conn = DBConnect()
+    DBConnect().drop() # Чистим базу
+    db_conn = DBConnect() # Инициализация и создание таблиц
 
 
+    # Регистрация юзера Nikita
     db_conn.register_user('Nikita')
 
+
+    # Регистрация тем для викторин
     db_conn.register_new_genre('Безопасность')
     db_conn.register_new_genre('Политика компании')
     db_conn.register_new_genre('Безопасность')
@@ -343,6 +360,13 @@ def start_db():
 
 
 
+    # регистрация вопросов
+    # первый пункт - сам вопрос
+    # 2 - id группы genre
+    # 3 - Варианты ответов
+    # 4 - верный ответ
+    # 5 - колличиство баллов за ответ (сейчас сделан 1 балл, так как одна звезда. Но при расчете балоов считается как 7)
+    # 6 - ссылка на фото
     db_conn.register_qustion('Что нельзя засовывать в розетку?', 1, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]),
                              2, 1, 'foto/ava.jpg')
 
@@ -388,6 +412,10 @@ def start_db():
     db_conn.register_qustion('Вопрос 5', 3, json.dumps(['Чайник', "Принтер", "Пальцы", "Руки"]), 2,
                              1, 'foto/ava.jpg')
 
+
+
+
+    # Регистрация мероприятия
     db_conn.register_miro('Мир', 'video/mir.mp4', time.time() + 24 * 60 * 60 * 6)
 
 

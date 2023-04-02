@@ -3,9 +3,9 @@ import json
 import DB
 import os
 
-DB.start_db()
+DB.start_db() # заполнение базы данных тестовыми данными
 
-db_connect = DB.DBConnect()
+db_connect = DB.DBConnect() # Инициализация базы данных
 
 app = Flask(__name__, static_folder='video')
 
@@ -14,7 +14,8 @@ def index():
     return """API"""
 
 
-
+# Регистрация нового пользователя.
+# В ответ получим id пользователя
 @app.route('/register', methods=['POST'])
 def register():
     user_name = request.form.get('name')
@@ -24,6 +25,9 @@ def register():
     return jsonify({"user_id": db_connect.register_user(user_name)})
 
 
+
+
+# Регистрация нового мероприятия.
 @app.route('/registermiro', methods=['POST'])
 def register_miro():
     user_name = request.form.get('user_id')
@@ -34,6 +38,7 @@ def register_miro():
     return jsonify({"status": "OK"})
 
 
+# Запрос логов юзера
 @app.route('/get-logs', methods=['POST'])
 def get_logs():
     user_name = request.form.get('user_id')
@@ -44,12 +49,17 @@ def get_logs():
     return jsonify({"logs": db_connect.get_logs(user_name)})
 
 
+
+# Запрос всех мероприятий
 @app.route('/miro', methods=['GET'])
 def miro_get():
     data = db_connect.miro_get()
     # return jsonify({'user_id': user_id})
     return jsonify(data)
 
+
+
+# Запрос вариантов викторин
 @app.route('/genre', methods=['GET'])
 def genre_get():
     data = db_connect.genre_get()
@@ -57,6 +67,10 @@ def genre_get():
     return jsonify(data)
 
 
+
+
+# Получение нового вопроса для викторины.
+# Нужно id пользователя и id викторины (их можно получить через GET запрос к /genre)
 @app.route('/question', methods=['POST'])
 def question():
     user_id = request.form.get('user_id')
@@ -70,7 +84,7 @@ def question():
 
 
 
-
+# Получение баллов для юзера
 @app.route('/cash', methods=['POST'])
 def cash():
     user_id = request.form.get('user_id')
@@ -82,6 +96,8 @@ def cash():
     return jsonify(rez)
 
 
+
+# Проверка ответа на викторину и запись в базу
 @app.route('/answer', methods=['POST'])
 def answer():
     user_id = request.form.get('user_id')
@@ -103,7 +119,7 @@ def answer():
 
 
 
-
+# Стриминг видео с сервера
 @app.route('/videos/<path:filename>')
 def download_file_video(filename):
     # Получаем путь к файлу из переменной окружения BASE_DIR
@@ -114,7 +130,7 @@ def download_file_video(filename):
     return send_from_directory(directory=path, filename=filename)
 
 
-
+# Запрос фото с сервера
 @app.route('/foto/<path:filename>')
 def download_file_foto(filename):
     # Получаем путь к файлу из переменной окружения BASE_DIR
@@ -131,4 +147,5 @@ if __name__ == '__main__':
     except Exception as ex:
         print(ex)
     finally:
+        # Закрытие соединения с базой
         db_connect.close()
